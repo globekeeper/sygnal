@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import uuid4
 
 import aioapns
-from aioapns import APNs, NotificationRequest
+from aioapns import APNs, NotificationRequest, PushType
 from aioapns.common import NotificationResult
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_pem_x509_certificate
@@ -221,6 +221,7 @@ class ApnsPushkin(ConcurrencyLimitedPushkin):
         notif_id = str(uuid4())
 
         log.info(f"Sending as APNs-ID {notif_id}")
+        log.info(f"Shaved payload {shaved_payload}")
         span.set_tag("apns_id", notif_id)
 
         device_token = base64.b64decode(device.pushkey).hex()
@@ -230,6 +231,7 @@ class ApnsPushkin(ConcurrencyLimitedPushkin):
             message=shaved_payload,
             priority=prio,
             notification_id=notif_id,
+            push_type=PushType.ALERT,
         )
 
         try:
